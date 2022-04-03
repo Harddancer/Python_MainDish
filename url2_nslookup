@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Sep 13 18:52:08 2021
+
+@author: yamamotod
+"""
+
+
+#!/usr/bin/python3
+
+# -*- coding: utf-8 -*-
+
+ 
+
+#------------------------------------------------------------------------
+
+#Раздел подключения необходимых модулей
+
+ 
+
+from nslookup import Nslookup
+
+import openpyxl as ox
+
+#------------------------------------------------------------------------
+
+ 
+
+data_path = 'data.xlsx'
+
+data_rez = 'rez.csv'
+
+ 
+
+rez = open(data_rez,'w', encoding='utf-8')
+
+rez.writelines('dns;url;ip\n')
+
+dns_host = ['213.87.2.88', '213.87.2.89']
+
+hosts = []
+
+d = ox.open(data_path)
+
+data = d.active
+
+rows = data.max_row
+
+cols = data.max_column
+
+for c in range(1, cols+1):
+
+    if data.cell(row=1, column=c).value == 'Ссылка':
+
+        url_index = c
+
+for r in range(2, rows+1):
+
+    hosts.append(str(data.cell(row=r, column=url_index).value))
+
+ 
+
+for d in dns_host:
+
+    for h in hosts:
+
+        s = ''
+
+        ips_record = Nslookup(dns_servers=[d]).dns_lookup(h)
+
+        for a in ips_record.answer:
+
+            s+=str(a) + ','
+
+        rez.writelines(d + ';' + h + ';' + s + '\n')
+
+        print(d + ';' + h + ';' + s)
+
+rez.close()
